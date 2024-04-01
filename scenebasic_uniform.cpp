@@ -7,6 +7,7 @@
 
 #include "helper/glutils.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "shader.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -26,17 +27,22 @@ void SceneBasic_Uniform::initScene()
     view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
 
-    // Set lighting information
-    prog.setUniform("light.position", view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
-    prog.setUniform("light.ld", vec3(1.0f));
-    prog.setUniform("light.la", vec3(0.4f));
-    prog.setUniform("light.ls", vec3(1.0f));
+    // Set lighting uniforms
+    LightInfo lights[] = {
+        {view * glm::vec4(+5.0f, 5.0f, 2.0f, 1.0f), vec3(1.0f), vec3(0.4f), vec3(1.0f)},
+        {view * glm::vec4(-5.0f, 5.0f, 2.0f, 1.0f), vec3(0.5f, 0.0f, 0.0f), vec3(0.4f), vec3(1.0f)},
+    };
+    unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
 
-    // Set material information
-    prog.setUniform("material.kd", vec3(0.2f, 0.55f, 0.9f));
-    prog.setUniform("material.ka", vec3(0.2f, 0.55f, 0.9f));
-    prog.setUniform("material.ks", vec3(0.8f));
-    prog.setUniform("material.shiny", 100.0f);
+    for (int i = 0; i < num_lights; i++)
+    {
+        lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
+    }
+    prog.setUniform("num_lights", num_lights);
+
+    // Set material uniform
+    MaterialInfo mat{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f), vec3(1.0f), 100.0f};
+    mat.setUniform(&prog, "material");
 }
 
 void SceneBasic_Uniform::compile()

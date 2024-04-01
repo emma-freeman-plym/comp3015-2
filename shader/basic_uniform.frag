@@ -1,5 +1,7 @@
 #version 460
 
+const uint max_lights = 5;
+
 in vec3 position;
 in vec3 normal;
 layout (location = 0) out vec4 color;
@@ -10,7 +12,9 @@ uniform struct LightInfo {
     vec3 ld;
     vec3 la;
     vec3 ls;
-} light;
+} lights[max_lights];
+
+uniform uint num_lights;
 
 // Materials store a diffuse/ambient/specular reflectivity,
 // and a shininess factor.
@@ -21,15 +25,15 @@ uniform struct MaterialInfo {
     float shiny;
 } material;
 
-vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
+vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
     // Calculate output color using the Phong lighting model.
 
     // Light direction is a vector from the light position
     // to this position, normalized.
     vec3 s = normalize(vec3(light.position.xyz - pos));
-    float sdn = max(dot(s, n), 0.0);
+    float sdn = max(dot(s, normal), 0.0);
     vec3 v = normalize(-pos);
-    vec3 r = reflect(-s, n);
+    vec3 r = reflect(-s, normal);
 
     // Sum of Phong components
     vec3 ambient  = light.la * mat.ka;
@@ -39,5 +43,8 @@ vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
 }
 
 void main() {
-    color = vec4(phong(light, material, position, normal), 1.0);
+    color = vec4(0.0);
+    for (int i = 0; i < num_lights; i++) {
+        color += vec4(phong(lights[i], material, position, normal), 1.0);
+    }
 }
