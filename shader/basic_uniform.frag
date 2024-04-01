@@ -2,6 +2,9 @@
 
 const uint max_lights = 5;
 
+const uint toon_levels = 3;
+const float toon_sf = 1.0 / toon_levels; 
+
 in vec3 position;
 in vec3 normal;
 in vec2 tex_coord;
@@ -41,8 +44,8 @@ vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
 
     // Sum of Phong components
     vec3 ambient  = light.la * tex_color;
-    vec3 diffuse  = light.ld * tex_color * sdn;
-    vec3 specular = light.ls * mat.ks * pow(max(dot(r, v), 0.0), mat.shiny);
+    vec3 diffuse  = light.ld * tex_color * floor(sdn * toon_levels) * toon_sf;
+    vec3 specular = light.ls * mat.ks * floor(pow(max(dot(r, v), 0.0), mat.shiny) * toon_levels) * toon_sf;
     return ambient + diffuse + specular;
 }
 
