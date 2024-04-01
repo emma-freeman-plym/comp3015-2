@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "helper/glutils.h"
+#include "helper/texture.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "shader.h"
 
@@ -37,7 +38,6 @@ void SceneBasic_Uniform::initScene()
     // Set lighting uniforms
     LightInfo lights[] = {
         {view * glm::vec4(+5.0f, 5.0f, 2.0f, 1.0f), vec3(1.0f), vec3(0.4f), vec3(1.0f)},
-        {view * glm::vec4(-5.0f, 5.0f, 2.0f, 1.0f), vec3(0.5f, 0.0f, 0.0f), vec3(0.4f), vec3(1.0f)},
     };
     unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
 
@@ -50,6 +50,11 @@ void SceneBasic_Uniform::initScene()
     // Set material uniform
     MaterialInfo mat{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f), vec3(1.0f), 100.0f};
     mat.setUniform(&prog, "material");
+
+    // Load textures
+    GLuint texId = Texture::loadTexture("media/me_textile.png");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texId);
 }
 
 void SceneBasic_Uniform::compile()

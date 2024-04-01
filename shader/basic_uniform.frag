@@ -4,7 +4,11 @@ const uint max_lights = 5;
 
 in vec3 position;
 in vec3 normal;
+in vec2 tex_coord;
+
 layout (location = 0) out vec4 color;
+
+layout (binding = 0) uniform sampler2D diffuse_tex;
 
 // Lights store a position and diffuse/ambient/specular intensity.
 uniform struct LightInfo {
@@ -37,7 +41,7 @@ vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
 
     // Sum of Phong components
     vec3 ambient  = light.la * mat.ka;
-    vec3 diffuse  = light.ld * mat.kd * sdn;
+    vec3 diffuse  = light.ld * texture(diffuse_tex, tex_coord).rgb * sdn;
     vec3 specular = light.ls * mat.ks * pow(max(dot(r, v), 0.0), mat.shiny);
     return ambient + diffuse + specular;
 }
