@@ -52,9 +52,9 @@ void SceneBasic_Uniform::initScene()
     mat.setUniform(&prog, "material");
 
     // Load textures
-    GLuint texId = Texture::loadTexture("media/me_textile.png");
+    GLuint diffuse = Texture::loadTexture("media/Wood_Chiseled_001_basecolor.jpg");
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texId);
+    glBindTexture(GL_TEXTURE_2D, diffuse);
 }
 
 void SceneBasic_Uniform::compile()

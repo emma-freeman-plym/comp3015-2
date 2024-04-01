@@ -32,16 +32,16 @@ uniform struct MaterialInfo {
 vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
     // Calculate output color using the Phong lighting model.
 
-    // Light direction is a vector from the light position
-    // to this position, normalized.
+    vec3 tex_color = texture(diffuse_tex, tex_coord).rgb;
+
     vec3 s = normalize(vec3(light.position.xyz - pos));
     float sdn = max(dot(s, normal), 0.0);
     vec3 v = normalize(-pos);
     vec3 r = reflect(-s, normal);
 
     // Sum of Phong components
-    vec3 ambient  = light.la * mat.ka;
-    vec3 diffuse  = light.ld * texture(diffuse_tex, tex_coord).rgb * sdn;
+    vec3 ambient  = light.la * tex_color;
+    vec3 diffuse  = light.ld * tex_color * sdn;
     vec3 specular = light.ls * mat.ks * pow(max(dot(r, v), 0.0), mat.shiny);
     return ambient + diffuse + specular;
 }
