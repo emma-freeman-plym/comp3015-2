@@ -13,18 +13,21 @@ using glm::mat4;
 using glm::vec3;
 using std::string;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30, 30) {}
+SceneBasic_Uniform::SceneBasic_Uniform() {}
 
 void SceneBasic_Uniform::initScene()
 {
     // Compile shaders
     compile();
-    // Enable depth buffers
     glEnable(GL_DEPTH_TEST);
+
+    // Load mesh
+    mesh = ObjMesh::load("media/chess_piece.obj", true);
+
     // Set up projection matrices
     model = mat4(1.0f);
     model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
-    view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(vec3(0.0f, 2.75f, 0.4f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
 
     // Set lighting uniforms
@@ -69,7 +72,7 @@ void SceneBasic_Uniform::render()
 
     // Render torus by setting matrix uniforms and calling method.
     setMatrices();
-    torus.render();
+    mesh->render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
