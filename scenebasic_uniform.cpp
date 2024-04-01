@@ -22,7 +22,11 @@ void SceneBasic_Uniform::initScene()
     glEnable(GL_DEPTH_TEST);
 
     // Load mesh
+    // This is placed here rather than in the constructor so that
+    // shader errors occur before model loading, which speeds up
+    // development time.
     mesh = ObjMesh::load("media/chess_piece.obj", true);
+    rotation = 0;
 
     // Set up projection matrices
     model = mat4(1.0f);
@@ -64,11 +68,18 @@ void SceneBasic_Uniform::compile()
     }
 }
 
-void SceneBasic_Uniform::update(float t) {}
+void SceneBasic_Uniform::update(float t)
+{
+    rotation += 0.025;
+}
 
 void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Rotate the 0th light
+    glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
+    prog.setUniform("lights[0].position", base * glm::rotate(mat4(1.0f), glm::radians(rotation), vec3(0.0f, 1.0f, 0.0f)));
 
     // Render torus by setting matrix uniforms and calling method.
     setMatrices();

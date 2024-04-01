@@ -13,6 +13,7 @@ class SceneBasic_Uniform : public Scene
 private:
     GLSLProgram prog;
     std::unique_ptr<ObjMesh> mesh;
+    float rotation;
 
     void compile();
     void setMatrices();
