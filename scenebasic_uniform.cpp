@@ -32,7 +32,6 @@ void SceneBasic_Uniform::initScene()
 
     // Set up projection matrices
     model = mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
     view = glm::lookAt(vec3(0.0f, 3.0f, 0.3f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
 
@@ -84,7 +83,7 @@ void SceneBasic_Uniform::compile()
 
 void SceneBasic_Uniform::update(float t)
 {
-    rotation += 0.025;
+    rotation += 0.04f;
 }
 
 void SceneBasic_Uniform::render()
@@ -95,7 +94,9 @@ void SceneBasic_Uniform::render()
     glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
     prog.setUniform("lights[0].position", base * glm::rotate(mat4(1.0f), glm::radians(rotation), vec3(0.0f, 1.0f, 0.0f)));
 
-    // Render torus by setting matrix uniforms and calling method.
+    // Render mesh by setting matrix uniforms and calling method.
+    model = glm::rotate(mat4(1.0f), glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(rotation / 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
     mesh->render();
 }
