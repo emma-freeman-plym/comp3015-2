@@ -12,6 +12,8 @@ in vec2 tex_coord;
 layout (location = 0) out vec4 color;
 
 layout (binding = 0) uniform sampler2D diffuse_tex;
+layout (binding = 1) uniform sampler2D overlay_tex;
+layout (binding = 2) uniform sampler2D opacity_tex;
 
 // Lights store a position and diffuse/ambient/specular intensity.
 uniform struct LightInfo {
@@ -35,7 +37,10 @@ uniform struct MaterialInfo {
 vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
     // Calculate output color using the Phong lighting model.
 
-    vec3 tex_color = texture(diffuse_tex, tex_coord).rgb;
+    vec3 diffuse_color = texture(diffuse_tex, tex_coord).rgb;
+    vec3 overlay_color = texture(overlay_tex, tex_coord).rgb;
+    float opacity = texture(opacity_tex, tex_coord).x;
+    vec3 tex_color = mix(diffuse_color, overlay_color, opacity);
 
     vec3 s = normalize(vec3(light.position.xyz - pos));
     float sdn = max(dot(s, normal), 0.0);

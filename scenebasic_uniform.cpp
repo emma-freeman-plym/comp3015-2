@@ -52,9 +52,15 @@ void SceneBasic_Uniform::initScene()
     mat.setUniform(&prog, "material");
 
     // Load textures
-    GLuint diffuse = Texture::loadTexture("media/Wood_Chiseled_001_basecolor.jpg");
+    GLuint diffuse = Texture::loadTexture("media/Substance_Graph_BaseColor.jpg");
+    GLuint overlay = Texture::loadTexture("media/Surface_Imperfections_Cracks_001_basecolor.jpg");
+    GLuint opacity = Texture::loadTexture("media/Surface_Imperfections_Cracks_001_opacity.jpg");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, overlay);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, opacity);
 }
 
 void SceneBasic_Uniform::compile()
