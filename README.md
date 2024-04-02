@@ -1,7 +1,7 @@
 # COMP3015 OpenGL Scene
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/emma-freeman-plym/comp3015-2/main/preview.png">
+    <img src="https://github.com/emma-freeman-plym/comp3015-2/blob/main/preview.png?raw=true">
 </p>
 
 This project implements a basic scene in OpenGL using shaders.
