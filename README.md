@@ -10,7 +10,7 @@ The scene contains a custom 3d model of a chess piece, along with textures and l
 
 ## Features
 
-- Custom modelled chess piece object with UV unwrapping.
+- Custom modelled chess piece object with UV unwrapping made in Blender.
 
 - Diffusion marble texture from [here](https://3dtextures.me/2022/06/20/marble-white-008/).
 
