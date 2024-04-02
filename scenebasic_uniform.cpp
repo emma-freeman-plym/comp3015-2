@@ -33,7 +33,7 @@ void SceneBasic_Uniform::initScene()
     // Set up projection matrices
     model = mat4(1.0f);
     model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
-    view = glm::lookAt(vec3(0.0f, 2.75f, 0.4f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(vec3(0.0f, 3.0f, 0.3f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
 
     // Set lighting uniforms
