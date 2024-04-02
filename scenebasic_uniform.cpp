@@ -36,8 +36,10 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
 
     // Set lighting uniforms
+    vec3 v = vec3(0.2f, 0.3f, 0.3f);
     LightInfo lights[] = {
-        {view * glm::vec4(+5.0f, 5.0f, 2.0f, 1.0f), vec3(1.0f), vec3(0.4f), vec3(1.0f)},
+        {view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(0.5f), vec3(0.4f), vec3(0.5f)},
+        {view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), v, v, v},
     };
     unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
 
