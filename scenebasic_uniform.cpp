@@ -21,6 +21,7 @@ void SceneBasic_Uniform::initScene()
     // Compile shaders
     compile();
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
     // Load mesh
     // This is placed here rather than in the constructor so that
