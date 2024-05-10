@@ -13,6 +13,7 @@ private:
   GLSLProgram prog;
   std::unique_ptr<ObjMesh> mesh;
   float rotation;
+  float time;
 
   void compile();
   void setMatrices();

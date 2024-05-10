@@ -80,10 +80,16 @@ void SceneBasic_Uniform::compile() {
   }
 }
 
-void SceneBasic_Uniform::update(float t) { rotation += 0.04f; }
+void SceneBasic_Uniform::update(float t) {
+  rotation += 0.04f;
+  time = t;
+}
 
 void SceneBasic_Uniform::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Set time
+  prog.setUniform("time", time);
 
   // Rotate the 0th light
   glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
