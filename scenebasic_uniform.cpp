@@ -10,13 +10,17 @@
 #include "shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "helper/imgui/backends/imgui_impl_glfw.h"
+#include "helper/imgui/backends/imgui_impl_opengl3.h"
+#include "helper/imgui/imgui.h"
+
 using glm::mat4;
 using glm::vec3;
 using std::string;
 
 SceneBasic_Uniform::SceneBasic_Uniform() {}
 
-void SceneBasic_Uniform::initScene() {
+void SceneBasic_Uniform::initScene(void *win) {
   // Compile shaders
   compile();
   glEnable(GL_DEPTH_TEST);
@@ -66,6 +70,18 @@ void SceneBasic_Uniform::initScene() {
   glBindTexture(GL_TEXTURE_2D, overlay);
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, opacity);
+
+  // Setup ImGui context
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  // Due to compilation issues, `scene.h` can't see `GLFW/glfw3.h`.
+  // Instead, window is passed as a void pointer and cast.
+  // Yes, this is bad.
+  // If I had more time, I'd debug it, but for now it works.
+  ImGui_ImplGlfw_InitForOpenGL((GLFWwindow *)win, true);
+  ImGui_ImplOpenGL3_Init();
 }
 
 void SceneBasic_Uniform::compile() {
@@ -83,6 +99,12 @@ void SceneBasic_Uniform::compile() {
 void SceneBasic_Uniform::update(float t) {
   rotation += 0.04f;
   time = t;
+
+  // Update ImGui, handle input etc
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+  ImGui::ShowDemoWindow();
 }
 
 void SceneBasic_Uniform::render() {
@@ -103,6 +125,10 @@ void SceneBasic_Uniform::render() {
       glm::rotate(model, glm::radians(rotation / 6), vec3(0.0f, 1.0f, 0.0f));
   setMatrices();
   mesh->render();
+
+  // Render ImGui
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void SceneBasic_Uniform::resize(int w, int h) {

@@ -71,7 +71,7 @@ public:
 
     int run(Scene & scene) {
         scene.setDimensions(fbw, fbh);
-        scene.initScene();
+        scene.initScene(window);
         scene.resize(fbw, fbh);
 
         // Enter the main loop

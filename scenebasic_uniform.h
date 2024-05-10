@@ -5,6 +5,7 @@
 #include "helper/objmesh.h"
 #include "helper/scene.h"
 
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -21,7 +22,7 @@ private:
 public:
   SceneBasic_Uniform();
 
-  void initScene();
+  void initScene(void *win);
   void update(float t);
   void render();
   void resize(int, int);

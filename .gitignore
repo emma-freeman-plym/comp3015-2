@@ -2,3 +2,4 @@ Project_Template/
 x64/
 .vs/
 .vscode/
+*.ini
