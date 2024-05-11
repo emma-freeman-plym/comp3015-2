@@ -1,3 +1,5 @@
+#pragma once
+
 #include "helper/glslprogram.h"
 
 #include <glm/glm.hpp>

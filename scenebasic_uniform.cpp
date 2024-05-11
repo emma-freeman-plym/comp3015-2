@@ -21,22 +21,31 @@ using std::string;
 SceneBasic_Uniform::SceneBasic_Uniform() {}
 
 void SceneBasic_Uniform::initScene(void *win) {
+
   // Compile shaders
   compile();
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
-  // Load mesh
+  // Load meshes
   // This is placed here rather than in the constructor so that
   // shader errors occur before model loading, which speeds up
   // development time.
-  mesh = ObjMesh::load("media/chess_piece.obj", true);
-  rotation = 0;
+  objects = {Object("media/chess_piece.obj")};
+
+  objects[0].mat = {vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f),
+                    vec3(1.0f), 100.0f};
+
+  objects[0].diffuse =
+      Texture::loadTexture("media/Substance_Graph_BaseColor.jpg");
+  objects[0].overlay = Texture::loadTexture(
+      "media/Surface_Imperfections_Cracks_001_basecolor.jpg");
+  objects[0].opacity = Texture::loadTexture(
+      "media/Surface_Imperfections_Cracks_001_opacity.jpg");
 
   // Set up projection matrices
   model = mat4(1.0f);
-  view =
-      glm::lookAt(vec3(0.0f, 3.0f, 0.3f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+  view = glm::lookAt(vec3(0.0, 3.0, 0.3), vec3(0.0), vec3(0.0, 1.0, 0.0));
   projection = mat4(1.0f);
 
   // Set lighting uniforms
@@ -52,24 +61,6 @@ void SceneBasic_Uniform::initScene(void *win) {
     lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
   }
   prog.setUniform("num_lights", num_lights);
-
-  // Set material uniform
-  MaterialInfo mat{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f), vec3(1.0f),
-                   100.0f};
-  mat.setUniform(&prog, "material");
-
-  // Load textures
-  GLuint diffuse = Texture::loadTexture("media/Substance_Graph_BaseColor.jpg");
-  GLuint overlay = Texture::loadTexture(
-      "media/Surface_Imperfections_Cracks_001_basecolor.jpg");
-  GLuint opacity = Texture::loadTexture(
-      "media/Surface_Imperfections_Cracks_001_opacity.jpg");
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, diffuse);
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, overlay);
-  glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, opacity);
 
   // Setup ImGui context
   IMGUI_CHECKVERSION();
@@ -97,7 +88,7 @@ void SceneBasic_Uniform::compile() {
 }
 
 void SceneBasic_Uniform::update(float t) {
-  rotation += 0.04f;
+  objects[0].rot.z += 0.04f;
   time = t;
 
   // Update ImGui, handle input etc
@@ -114,17 +105,17 @@ void SceneBasic_Uniform::render() {
   prog.setUniform("time", time);
 
   // Rotate the 0th light
-  glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
-  prog.setUniform("lights[0].position",
-                  base * glm::rotate(mat4(1.0f), glm::radians(rotation),
-                                     vec3(0.0f, 1.0f, 0.0f)));
+  // glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
+  // prog.setUniform("lights[0].position",
+  //                 base * glm::rotate(mat4(1.0f), glm::radians(rotation),
+  //                                    vec3(0.0f, 1.0f, 0.0f)));
 
-  // Render mesh by setting matrix uniforms and calling method.
-  model = glm::rotate(mat4(1.0f), glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
-  model =
-      glm::rotate(model, glm::radians(rotation / 6), vec3(0.0f, 1.0f, 0.0f));
-  setMatrices();
-  mesh->render();
+  for (auto &obj : objects) {
+    obj.setUniforms(&prog);
+    model = obj.matrix();
+    setMatrices();
+    obj.render();
+  }
 
   // Render ImGui
   ImGui::Render();

@@ -5,6 +5,7 @@
 #include "helper/objmesh.h"
 #include "helper/scene.h"
 
+#include "object.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -12,8 +13,7 @@
 class SceneBasic_Uniform : public Scene {
 private:
   GLSLProgram prog;
-  std::unique_ptr<ObjMesh> mesh;
-  float rotation;
+  std::vector<Object> objects;
   float time;
 
   void compile();
