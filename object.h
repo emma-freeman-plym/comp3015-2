@@ -13,6 +13,7 @@ using glm::vec3;
 
 struct Object {
   std::string name;
+  std::string mesh;
   std::string diffuse;
   std::string overlay;
   std::string opacity;

@@ -28,7 +28,8 @@ void SceneBasic_Uniform::initScene(void *win) {
   glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
   objects = {
-      Object{"media/chess_piece.obj", "media/Substance_Graph_BaseColor.jpg",
+      Object{"chess", "media/chess_piece.obj",
+             "media/Substance_Graph_BaseColor.jpg",
              "media/Surface_Imperfections_Cracks_001_basecolor.jpg",
              "media/Surface_Imperfections_Cracks_001_opacity.jpg",
              MaterialInfo{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f),
@@ -88,27 +89,38 @@ void SceneBasic_Uniform::update(float t) {
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  // Main body of the Demo window starts here.
-  ImGui::Begin("Objects");
+  {
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
 
-  if (ImGui::Button("+")) {
-  }
+    ImGui::Begin("Objects");
 
-  // if (ImGui::BeginMenuBar()) {
-  //   ImGui::EndMenuBar();
-  // }
+    ImVec2 size;
 
-  if (ImGui::BeginTable("split", 2)) {
-    ImGui::NextColumn();
-    if (ImGui::Button("+")) {
+    float w = ImGui::GetWindowWidth() - ImGui::GetStyle().ItemSpacing.x * 3;
+    size = ImVec2(w / 2, 0.0f);
+
+    ImGui::Button("Add", size);
+    ImGui::SameLine();
+    ImGui::Button("Remove", size);
+
+    size = ImVec2(-FLT_MIN, -FLT_MIN);
+
+    if (ImGui::BeginListBox("listbox", size)) {
+      auto i = 0;
+      for (auto &obj : objects) {
+        auto sel = select_index == i;
+        if (ImGui::Selectable(obj.name.c_str(), sel)) {
+          select_index = i;
+        }
+        if (sel)
+          ImGui::SetItemDefaultFocus();
+        i++;
+      }
+      ImGui::EndListBox();
     }
-    ImGui::NextColumn();
-    if (ImGui::Button("-")) {
-    }
-    ImGui::EndTable();
-  }
 
-  ImGui::End();
+    ImGui::End();
+  }
 }
 
 void SceneBasic_Uniform::render() {
@@ -139,7 +151,7 @@ void SceneBasic_Uniform::render() {
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.opacity));
     }
     obj.mat.setUniform(&prog, "material");
-    mesh_cache.get(obj.name)->render();
+    mesh_cache.get(obj.mesh)->render();
   }
 
   // Render ImGui

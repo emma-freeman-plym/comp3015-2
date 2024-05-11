@@ -3,7 +3,7 @@
 #include "scenebasic_uniform.h"
 
 int main(int argc, char *argv[]) {
-  SceneRunner runner("Shader_Basics");
+  SceneRunner runner("Shader_Basics", 1200, 600);
 
   std::unique_ptr<Scene> scene;
 

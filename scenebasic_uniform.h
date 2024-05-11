@@ -17,6 +17,7 @@ private:
   std::vector<Object> objects;
   TextureCache tex_cache;
   MeshCache mesh_cache;
+  unsigned int select_index = 0;
 
   float time;
 
