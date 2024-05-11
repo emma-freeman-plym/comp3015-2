@@ -5,6 +5,7 @@
 #include "helper/objmesh.h"
 #include "helper/scene.h"
 
+#include "cache.h"
 #include "object.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -14,6 +15,9 @@ class SceneBasic_Uniform : public Scene {
 private:
   GLSLProgram prog;
   std::vector<Object> objects;
+  TextureCache tex_cache;
+  MeshCache mesh_cache;
+
   float time;
 
   void compile();

@@ -18,7 +18,7 @@ using glm::mat4;
 using glm::vec3;
 using std::string;
 
-SceneBasic_Uniform::SceneBasic_Uniform() {}
+SceneBasic_Uniform::SceneBasic_Uniform() : tex_cache(), mesh_cache() {}
 
 void SceneBasic_Uniform::initScene(void *win) {
 
@@ -27,21 +27,13 @@ void SceneBasic_Uniform::initScene(void *win) {
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
-  // Load meshes
-  // This is placed here rather than in the constructor so that
-  // shader errors occur before model loading, which speeds up
-  // development time.
-  objects = {Object("media/chess_piece.obj")};
-
-  objects[0].mat = {vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f),
-                    vec3(1.0f), 100.0f};
-
-  objects[0].diffuse =
-      Texture::loadTexture("media/Substance_Graph_BaseColor.jpg");
-  objects[0].overlay = Texture::loadTexture(
-      "media/Surface_Imperfections_Cracks_001_basecolor.jpg");
-  objects[0].opacity = Texture::loadTexture(
-      "media/Surface_Imperfections_Cracks_001_opacity.jpg");
+  objects = {
+      Object{"media/chess_piece.obj", "media/Substance_Graph_BaseColor.jpg",
+             "media/Surface_Imperfections_Cracks_001_basecolor.jpg",
+             "media/Surface_Imperfections_Cracks_001_opacity.jpg",
+             MaterialInfo{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f),
+                          vec3(1.0f), 100.0f}},
+  };
 
   // Set up projection matrices
   model = mat4(1.0f);
@@ -95,7 +87,28 @@ void SceneBasic_Uniform::update(float t) {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
-  ImGui::ShowDemoWindow();
+
+  // Main body of the Demo window starts here.
+  ImGui::Begin("Objects");
+
+  if (ImGui::Button("+")) {
+  }
+
+  // if (ImGui::BeginMenuBar()) {
+  //   ImGui::EndMenuBar();
+  // }
+
+  if (ImGui::BeginTable("split", 2)) {
+    ImGui::NextColumn();
+    if (ImGui::Button("+")) {
+    }
+    ImGui::NextColumn();
+    if (ImGui::Button("-")) {
+    }
+    ImGui::EndTable();
+  }
+
+  ImGui::End();
 }
 
 void SceneBasic_Uniform::render() {
@@ -111,10 +124,22 @@ void SceneBasic_Uniform::render() {
   //                                    vec3(0.0f, 1.0f, 0.0f)));
 
   for (auto &obj : objects) {
-    obj.setUniforms(&prog);
     model = obj.matrix();
     setMatrices();
-    obj.render();
+    if (obj.diffuse.length() > 0) {
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.diffuse));
+    }
+    if (obj.overlay.length() > 0) {
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.overlay));
+    }
+    if (obj.opacity.length() > 0) {
+      glActiveTexture(GL_TEXTURE2);
+      glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.opacity));
+    }
+    obj.mat.setUniform(&prog, "material");
+    mesh_cache.get(obj.name)->render();
   }
 
   // Render ImGui
