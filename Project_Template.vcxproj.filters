@@ -28,6 +28,9 @@
     <Filter Include="helper\imgui">
       <UniqueIdentifier>{0bdf67e4-8c8d-4138-999d-e2a87495271c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="helper\tinyfiledialog">
+      <UniqueIdentifier>{3b3a2b00-f791-4122-bbe6-3efe4ffcf6dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="helper\imgui\misc\cpp\imgui_stdlib.cpp">
       <Filter>helper\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\tinyfiledialogs\tinyfiledialogs.c">
+      <Filter>helper\tinyfiledialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +195,9 @@
     </ClInclude>
     <ClInclude Include="helper\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>helper\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\tinyfiledialogs\tinyfiledialogs.h">
+      <Filter>helper\tinyfiledialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

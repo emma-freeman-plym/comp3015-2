@@ -9,10 +9,13 @@
 #include "helper/texture.h"
 #include "shader.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "helper/imgui/backends/imgui_impl_glfw.h"
 #include "helper/imgui/backends/imgui_impl_opengl3.h"
 #include "helper/imgui/imgui.h"
+#include "helper/imgui/misc/cpp/imgui_stdlib.h"
+#include "helper/tinyfiledialogs/tinyfiledialogs.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -91,7 +94,7 @@ void SceneBasic_Uniform::update(float t) {
 
   {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-
+    ImGui::SetNextWindowSize(ImVec2(200, 400));
     ImGui::Begin("Objects");
 
     ImVec2 size;
@@ -117,9 +120,73 @@ void SceneBasic_Uniform::update(float t) {
         i++;
       }
       ImGui::EndListBox();
-    }
 
-    ImGui::End();
+      ImGui::End();
+    }
+    {
+      ImVec2 size = ImVec2(-FLT_MIN, 0);
+
+      const char *mesh_filters[2] = {"*.obj", "*.fbx"};
+      const char *tex_filters[2] = {"*.jpg", "*.png"};
+
+      ImGui::SetNextWindowPos(ImVec2(1200 - 200, 0));
+      ImGui::SetNextWindowSize(ImVec2(200, 400));
+      ImGui::Begin("Properties");
+
+      if (select_index <= objects.size()) {
+        auto &obj = objects[select_index];
+        ImGui::InputText("Name", &obj.name);
+
+        if (ImGui::Button("Mesh", size)) {
+          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
+                                                   mesh_filters, NULL, 0);
+          if (file)
+            obj.mesh = std::string(file);
+        }
+
+        ImGui::SeparatorText("Textures");
+
+        if (ImGui::Button("Diffuse", size)) {
+          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
+                                                   tex_filters, NULL, 0);
+          if (file)
+            obj.diffuse = std::string(file);
+          else
+            obj.diffuse = "";
+        }
+        if (ImGui::Button("Overlay", size)) {
+          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
+                                                   tex_filters, NULL, 0);
+          if (file)
+            obj.overlay = std::string(file);
+          else
+            obj.overlay = "";
+        }
+        if (ImGui::Button("Opacity", size)) {
+          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
+                                                   tex_filters, NULL, 0);
+          if (file)
+            obj.opacity = std::string(file);
+          else
+            obj.opacity = "";
+        }
+
+        ImGui::SeparatorText("Transform");
+
+        ImGui::DragFloat3("Position", glm::value_ptr(obj.pos), 1.0, -5, 5);
+        ImGui::DragFloat3("Rotation", glm::value_ptr(obj.rot), 1.0, -360, 360);
+        ImGui::DragFloat3("Scale", glm::value_ptr(obj.scale), 1.0, 0.05, 5);
+
+        ImGui::SeparatorText("Material");
+
+        ImGui::ColorEdit3("Kd", glm::value_ptr(obj.mat.kd));
+        ImGui::ColorEdit3("Ka", glm::value_ptr(obj.mat.ka));
+        ImGui::ColorEdit3("Ks", glm::value_ptr(obj.mat.ks));
+        ImGui::SliderFloat("Shininess", &obj.mat.shiny, 0, 100);
+      }
+
+      ImGui::End();
+    }
   }
 }
 

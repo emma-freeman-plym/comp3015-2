@@ -20,11 +20,13 @@ struct Object {
   MaterialInfo mat;
   vec3 pos = vec3(0.0);
   vec3 rot = vec3(0.0);
+  vec3 scale = vec3(1.0);
 
   mat4 matrix() {
     // Compute a model matrix from the position and rotation.
     mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, pos);
+    model = glm::scale(model, scale);
     model = glm::rotate(model, glm::radians(rot.x), vec3(1, 0, 0));
     model = glm::rotate(model, glm::radians(rot.y), vec3(0, 1, 0));
     model = glm::rotate(model, glm::radians(rot.z), vec3(0, 0, 1));
