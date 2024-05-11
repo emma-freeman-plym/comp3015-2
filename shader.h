@@ -23,11 +23,13 @@ struct MaterialInfo {
   glm::vec3 ka;
   glm::vec3 ks;
   float shiny;
+  bool toon;
 
   void setUniform(GLSLProgram *prog, std::string name) {
     prog->setUniform((name + ".kd").c_str(), kd);
     prog->setUniform((name + ".ka").c_str(), ka);
     prog->setUniform((name + ".ks").c_str(), ks);
     prog->setUniform((name + ".shiny").c_str(), shiny);
+    prog->setUniform((name + ".toon").c_str(), toon);
   }
 };

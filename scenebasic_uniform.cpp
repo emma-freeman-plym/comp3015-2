@@ -84,7 +84,6 @@ void SceneBasic_Uniform::compile() {
 }
 
 void SceneBasic_Uniform::update(float t) {
-  objects[0].rot.z += 0.04f;
   time = t;
 
   // Update ImGui, handle input etc
@@ -197,6 +196,7 @@ void SceneBasic_Uniform::update(float t) {
         ImGui::ColorEdit3("Ka", glm::value_ptr(obj.mat.ka));
         ImGui::ColorEdit3("Ks", glm::value_ptr(obj.mat.ks));
         ImGui::SliderFloat("Shininess", &obj.mat.shiny, 0, 100);
+        ImGui::Checkbox("Toon", &obj.mat.toon);
       }
 
       ImGui::End();

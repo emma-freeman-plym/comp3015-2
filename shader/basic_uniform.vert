@@ -19,13 +19,20 @@ uniform mat4 model_view_matrix;
 uniform mat4 model_view_projection;
 uniform mat3 normal_matrix;
 
-void main() {
-    vec4 vpos = vec4(vertex_position, 1.0);
-    float off = amp * sin(freq * vpos.z - velocity * time);
-    vpos += vec4(normalize(vertex_normal), 1.0) * off;
+// void main() {
+//     vec4 vpos = vec4(vertex_position, 1.0);
+//     float off = amp * sin(freq * vpos.z - velocity * time);
+//     vpos += vec4(normalize(vertex_normal), 1.0) * off;
 
-    position = (model_view_matrix * vpos).xyz;
+//     position = (model_view_matrix * vpos).xyz;
+//     normal = normalize(normal_matrix * vertex_normal);
+//     tex_coord = vertex_tex_coord;
+//     gl_Position = model_view_projection * vpos;
+// }
+
+void main() {
+    position = (model_view_matrix * vec4(vertex_position, 1.0)).xyz;
     normal = normalize(normal_matrix * vertex_normal);
     tex_coord = vertex_tex_coord;
-    gl_Position = model_view_projection * vpos;
+    gl_Position = model_view_projection * vec4(vertex_position, 1.0);
 }
