@@ -102,9 +102,23 @@ void SceneBasic_Uniform::update(float t) {
     float w = ImGui::GetWindowWidth() - ImGui::GetStyle().ItemSpacing.x * 3;
     size = ImVec2(w / 2, 0.0f);
 
-    ImGui::Button("Add", size);
+    if (ImGui::Button("Add", size)) {
+      objects.push_back(Object{
+          "new object",
+          "media/cube.obj",
+          "",
+          "",
+          "",
+          MaterialInfo{vec3(0.5), vec3(0.5), vec3(1.0), 100.0},
+      });
+    }
     ImGui::SameLine();
-    ImGui::Button("Remove", size);
+    if (ImGui::Button("Remove", size)) {
+      if (0 <= select_index && select_index < objects.size()) {
+        objects.erase(objects.begin() + select_index);
+        select_index = -1;
+      }
+    }
 
     size = ImVec2(-FLT_MIN, -FLT_MIN);
 
@@ -133,7 +147,7 @@ void SceneBasic_Uniform::update(float t) {
       ImGui::SetNextWindowSize(ImVec2(200, 400));
       ImGui::Begin("Properties");
 
-      if (select_index <= objects.size()) {
+      if (0 <= select_index && select_index <= objects.size()) {
         auto &obj = objects[select_index];
         ImGui::InputText("Name", &obj.name);
 
@@ -205,18 +219,24 @@ void SceneBasic_Uniform::render() {
   for (auto &obj : objects) {
     model = obj.matrix();
     setMatrices();
-    if (obj.diffuse.length() > 0) {
-      glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
+    if (obj.diffuse.length() > 0)
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.diffuse));
-    }
-    if (obj.overlay.length() > 0) {
-      glActiveTexture(GL_TEXTURE1);
+    else
+      glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    if (obj.overlay.length() > 0)
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.overlay));
-    }
-    if (obj.opacity.length() > 0) {
-      glActiveTexture(GL_TEXTURE2);
+    else
+      glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE2);
+    if (obj.opacity.length() > 0)
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.opacity));
-    }
+    else
+      glBindTexture(GL_TEXTURE_2D, 0);
+
     obj.mat.setUniform(&prog, "material");
     mesh_cache.get(obj.mesh)->render();
   }
