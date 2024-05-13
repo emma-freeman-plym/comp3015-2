@@ -2,11 +2,11 @@
 
 #include "helper/json/json.hpp"
 #include "helper/objmesh.h"
-#include "shader.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "material.h"
 #include "scenebasic_uniform.h"
 
 using glm::mat4;
@@ -19,7 +19,7 @@ struct Object {
   std::string diffuse;
   std::string overlay;
   std::string opacity;
-  MaterialInfo mat;
+  Material mat;
   vec3 pos = vec3(0.0);
   vec3 rot = vec3(0.0);
   vec3 scale = vec3(1.0);
@@ -41,10 +41,7 @@ struct Object {
             {"diffuse", diffuse},
             {"overlay", overlay},
             {"opacity", opacity},
-            {"mat",
-             {{"color", {mat.color.r, mat.color.g, mat.color.b}},
-              {"rough", mat.rough},
-              {"metal", mat.metal}}},
+            {"mat", mat.serialize()},
             {"pos", {pos.x, pos.y, pos.z}},
             {"rot", {rot.x, rot.y, rot.z}},
             {"scale", {scale.x, scale.y, scale.z}}};
@@ -56,9 +53,7 @@ struct Object {
             j["diffuse"],
             j["overlay"],
             j["opacity"],
-            {{j["mat"]["color"][0], j["mat"]["color"][1], j["mat"]["color"][2]},
-             j["mat"]["rough"],
-             j["mat"]["metal"]},
+            Material::deserialize(j["mat"]),
             {j["pos"][0], j["pos"][1], j["pos"][2]},
             {j["rot"][0], j["rot"][1], j["rot"][2]},
             {j["scale"][0], j["scale"][1], j["scale"][2]}};

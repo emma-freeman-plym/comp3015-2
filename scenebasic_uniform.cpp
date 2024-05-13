@@ -8,7 +8,6 @@
 
 #include "helper/glutils.h"
 #include "helper/texture.h"
-#include "shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -17,6 +16,10 @@
 #include "helper/imgui/imgui.h"
 #include "helper/imgui/misc/cpp/imgui_stdlib.h"
 #include "helper/tinyfiledialogs/tinyfiledialogs.h"
+
+#include "light.h"
+#include "material.h"
+#include "object.h"
 
 using glm::mat4;
 using glm::vec3;
@@ -39,8 +42,8 @@ void SceneBasic_Uniform::initScene(void *win) {
   projection = mat4(1.0f);
 
   // Set lighting uniforms
-  LightInfo lights[] = {{view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50},
-                        {view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), 35}};
+  Light lights[] = {{POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50},
+                    {POINT, view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), 35}};
   unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
 
   for (int i = 0; i < num_lights; i++) {
@@ -134,13 +137,13 @@ void SceneBasic_Uniform::update(float t) {
     size = ImVec2(w / 2, 0.0f);
 
     if (ImGui::Button("Add", size)) {
-      objects.push_back(Object{
+      objects.push_back({
           "new object",
           "media/cube.obj",
           "",
           "",
           "",
-          MaterialInfo{vec3(0.5), 0.5, false},
+          {vec3(0.5), 0.5, false},
       });
     }
     ImGui::SameLine();
