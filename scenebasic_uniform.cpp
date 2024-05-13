@@ -42,9 +42,9 @@ void SceneBasic_Uniform::initScene(void *win) {
   projection = mat4(1.0f);
 
   // Set lighting uniforms
-  Light lights[] = {{POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50},
-                    {POINT, view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), 35}};
-  unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
+  lights = {{POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50},
+            {POINT, view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), 35}};
+  unsigned int num_lights = lights.size();
 
   for (int i = 0; i < num_lights; i++) {
     lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
@@ -86,13 +86,13 @@ void SceneBasic_Uniform::update(float t) {
 
   {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(200, 150));
+    ImGui::SetNextWindowSize(ImVec2(200, 0));
     ImGui::Begin("Scene");
 
-    ImVec2 size = ImVec2(-FLT_MIN, 0.0f);
+    ImVec2 full = ImVec2(-FLT_MIN, 0.0f);
     const char *filter[1] = {"*.json"};
 
-    if (ImGui::Button("Save", size)) {
+    if (ImGui::Button("Save", full)) {
       char const *file =
           tinyfd_saveFileDialog("Save Scene", NULL, 1, filter, NULL);
 
@@ -107,7 +107,7 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
-    if (ImGui::Button("Load", size)) {
+    if (ImGui::Button("Load", full)) {
       char const *file =
           tinyfd_openFileDialog("Load Scene", NULL, 1, filter, NULL, 0);
 
@@ -123,20 +123,12 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
-    ImGui::End();
-  }
-
-  {
-    ImGui::SetNextWindowPos(ImVec2(0, 150));
-    ImGui::SetNextWindowSize(ImVec2(200, 400));
-    ImGui::Begin("Objects");
-
-    ImVec2 size;
+    ImGui::SeparatorText("Objects");
 
     float w = ImGui::GetWindowWidth() - ImGui::GetStyle().ItemSpacing.x * 3;
-    size = ImVec2(w / 2, 0.0f);
+    ImVec2 half = ImVec2(w / 2, 0.0f);
 
-    if (ImGui::Button("Add", size)) {
+    if (ImGui::Button("Add", half)) {
       objects.push_back({
           "new object",
           "media/cube.obj",
@@ -147,16 +139,14 @@ void SceneBasic_Uniform::update(float t) {
       });
     }
     ImGui::SameLine();
-    if (ImGui::Button("Remove", size)) {
+    if (ImGui::Button("Remove", half)) {
       if (0 <= select_index && select_index < objects.size()) {
         objects.erase(objects.begin() + select_index);
         select_index = -1;
       }
     }
 
-    size = ImVec2(-FLT_MIN, -FLT_MIN);
-
-    if (ImGui::BeginListBox("listbox", size)) {
+    if (ImGui::BeginListBox("objects", ImVec2(-FLT_MIN, 200))) {
       auto i = 0;
       for (auto &obj : objects) {
         auto sel = select_index == i;
@@ -168,72 +158,73 @@ void SceneBasic_Uniform::update(float t) {
         i++;
       }
       ImGui::EndListBox();
-
-      ImGui::End();
     }
-    {
-      ImVec2 size = ImVec2(-FLT_MIN, 0);
 
-      const char *mesh_filters[2] = {"*.obj", "*.fbx"};
-      const char *tex_filters[2] = {"*.jpg", "*.png"};
+    ImGui::End();
+  }
 
-      ImGui::SetNextWindowPos(ImVec2(1200 - 200, 0));
-      ImGui::SetNextWindowSize(ImVec2(200, 400));
-      ImGui::Begin("Properties");
+  {
+    ImGui::SetNextWindowPos(ImVec2(1200 - 200, 0));
+    ImGui::SetNextWindowSize(ImVec2(200, 400));
+    ImGui::Begin("Properties");
 
-      if (0 <= select_index && select_index <= objects.size()) {
-        auto &obj = objects[select_index];
-        ImGui::InputText("Name", &obj.name);
+    ImVec2 size = ImVec2(-FLT_MIN, 0);
 
-        if (ImGui::Button("Mesh", size)) {
-          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
-                                                   mesh_filters, NULL, 0);
-          if (file)
-            obj.mesh = std::string(file);
-        }
+    const char *mesh_filters[2] = {"*.obj", "*.fbx"};
+    const char *tex_filters[2] = {"*.jpg", "*.png"};
 
-        ImGui::SeparatorText("Textures");
+    if (0 <= select_index && select_index <= objects.size()) {
+      auto &obj = objects[select_index];
+      ImGui::InputText("Name", &obj.name);
 
-        if (ImGui::Button("Diffuse", size)) {
-          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
-                                                   tex_filters, NULL, 0);
-          if (file)
-            obj.diffuse = std::string(file);
-          else
-            obj.diffuse = "";
-        }
-        if (ImGui::Button("Overlay", size)) {
-          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
-                                                   tex_filters, NULL, 0);
-          if (file)
-            obj.overlay = std::string(file);
-          else
-            obj.overlay = "";
-        }
-        if (ImGui::Button("Opacity", size)) {
-          char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
-                                                   tex_filters, NULL, 0);
-          if (file)
-            obj.opacity = std::string(file);
-          else
-            obj.opacity = "";
-        }
-
-        ImGui::SeparatorText("Transform");
-
-        ImGui::DragFloat3("Position", glm::value_ptr(obj.pos), 1.0, -5, 5);
-        ImGui::DragFloat3("Rotation", glm::value_ptr(obj.rot), 1.0, -360, 360);
-        ImGui::DragFloat3("Scale", glm::value_ptr(obj.scale), 1.0, 0.05, 5);
-
-        ImGui::SeparatorText("Material");
-
-        ImGui::ColorEdit3("Color", glm::value_ptr(obj.mat.color));
-        ImGui::SliderFloat("Roughness", &obj.mat.rough, 0.0, 1.0);
-        ImGui::Checkbox("Metal", &obj.mat.metal);
+      if (ImGui::Button("Mesh", size)) {
+        char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
+                                                 mesh_filters, NULL, 0);
+        if (file)
+          obj.mesh = std::string(file);
       }
 
-      ImGui::End();
+      ImGui::SeparatorText("Textures");
+
+      if (ImGui::Button("Diffuse", size)) {
+        char const *file =
+            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        if (file)
+          obj.diffuse = std::string(file);
+        else
+          obj.diffuse = "";
+      }
+      if (ImGui::Button("Overlay", size)) {
+        char const *file =
+            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        if (file)
+          obj.overlay = std::string(file);
+        else
+          obj.overlay = "";
+      }
+      if (ImGui::Button("Opacity", size)) {
+        char const *file =
+            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        if (file)
+          obj.opacity = std::string(file);
+        else
+          obj.opacity = "";
+      }
+
+      ImGui::SeparatorText("Transform");
+
+      ImGui::DragFloat3("Position", glm::value_ptr(obj.pos), 1.0, -5, 5);
+      ImGui::DragFloat3("Rotation", glm::value_ptr(obj.rot), 1.0, -360, 360);
+      ImGui::DragFloat3("Scale", glm::value_ptr(obj.scale), 1.0, 0.05, 5);
+
+      ImGui::SeparatorText("Material");
+
+      ImGui::ColorEdit3("Color", glm::value_ptr(obj.mat.color));
+      ImGui::SliderFloat("Roughness", &obj.mat.rough, 0.0, 1.0);
+      ImGui::Checkbox("Metal", &obj.mat.metal);
     }
+
+    ImGui::End();
   }
 }
 

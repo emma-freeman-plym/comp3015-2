@@ -6,6 +6,7 @@
 #include "helper/scene.h"
 
 #include "cache.h"
+#include "light.h"
 #include "object.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -15,6 +16,7 @@ class SceneBasic_Uniform : public Scene {
 private:
   GLSLProgram prog;
   std::vector<Object> objects;
+  std::vector<Light> lights;
   TextureCache tex_cache;
   MeshCache mesh_cache;
   int select_index = -1;
