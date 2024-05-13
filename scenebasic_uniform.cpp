@@ -122,13 +122,13 @@ void SceneBasic_Uniform::update(float t) {
     float w = ImGui::GetWindowWidth() - ImGui::GetStyle().ItemSpacing.x * 3;
     ImVec2 half = ImVec2(w / 2, 0.0f);
 
-    if (ImGui::Button("Add", half)) {
+    if (ImGui::Button("Add##objects", half)) {
       objects.push_back(Object("New object", "media/cube.obj", "", "", "",
                                Material(vec3(0.5), 0.5, false), vec3(0.0),
                                vec3(0.0), vec3(1.0)));
     }
     ImGui::SameLine();
-    if (ImGui::Button("Remove", half)) {
+    if (ImGui::Button("Remove##objects", half)) {
       if (0 <= obj_index && obj_index < objects.size()) {
         objects.erase(objects.begin() + obj_index);
         obj_index = -1;
@@ -152,11 +152,14 @@ void SceneBasic_Uniform::update(float t) {
 
     ImGui::SeparatorText("Lights");
 
-    if (ImGui::Button("Add", half)) {
-      lights.push_back(Light("New light", POINT, vec3(0.0), vec3(50.0)));
+    if (ImGui::Button("Add##lights", half)) {
+      std::cout << "new light" << std::endl;
+      lights.push_back(Light("New light", POINT,
+                             view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f),
+                             vec3(50.0)));
     }
     ImGui::SameLine();
-    if (ImGui::Button("Remove", half)) {
+    if (ImGui::Button("Remove##lights", half)) {
       if (0 <= light_index && light_index < lights.size()) {
         lights.erase(lights.begin() + light_index);
         light_index = -1;
