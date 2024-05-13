@@ -19,6 +19,7 @@ layout(binding = 2) uniform sampler2D opacity_tex;
 
 // Lights store a position and diffuse/ambient/specular intensity.
 uniform struct LightInfo {
+    uint kind;
     vec3 position;
     vec3 intensity;
 } lights[max_lights];
@@ -67,11 +68,18 @@ float geom_smith(MaterialInfo mat, float d) {
 vec3 microfacet(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
     vec3 diffuse_brdf = mat.metal ? vec3(0.0) : get_color(mat);
 
-    vec3 l = light.position - pos;
+    vec3 l = vec3(0);
     vec3 i = light.intensity;
-    float dist = length(l);
-    l = normalize(l);
-    i /= dist * dist;
+    if(light.kind == 0) {
+        // Point
+        l = light.position - pos;
+        float dist = length(l);
+        l = normalize(l);
+        i /= dist * dist;
+    } else {
+        // Directional
+        l = normalize(light.position);
+    }
 
     vec3 v = normalize(-position);
     vec3 h = normalize(v + l);
