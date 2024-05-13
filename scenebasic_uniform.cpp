@@ -195,7 +195,7 @@ void SceneBasic_Uniform::update(float t) {
         ImGui::ColorEdit3("Kd", glm::value_ptr(obj.mat.kd));
         ImGui::ColorEdit3("Ka", glm::value_ptr(obj.mat.ka));
         ImGui::ColorEdit3("Ks", glm::value_ptr(obj.mat.ks));
-        ImGui::SliderFloat("Shininess", &obj.mat.shiny, 0, 100);
+        ImGui::SliderFloat("Shininess", &obj.mat.shiny, 0.1, 500);
         ImGui::Checkbox("Toon", &obj.mat.toon);
       }
 
