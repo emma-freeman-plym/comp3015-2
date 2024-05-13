@@ -6,30 +6,22 @@
 
 struct LightInfo {
   glm::vec4 position;
-  glm::vec3 ld;
-  glm::vec3 la;
-  glm::vec3 ls;
+  float intensity;
 
   void setUniform(GLSLProgram *prog, std::string name) {
     prog->setUniform((name + ".position").c_str(), position);
-    prog->setUniform((name + ".ld").c_str(), ld);
-    prog->setUniform((name + ".la").c_str(), la);
-    prog->setUniform((name + ".ls").c_str(), ls);
+    prog->setUniform((name + ".intensity").c_str(), intensity);
   }
 };
 
 struct MaterialInfo {
-  glm::vec3 kd;
-  glm::vec3 ka;
-  glm::vec3 ks;
-  float shiny;
-  bool toon;
+  glm::vec3 color;
+  float rough;
+  bool metal;
 
   void setUniform(GLSLProgram *prog, std::string name) {
-    prog->setUniform((name + ".kd").c_str(), kd);
-    prog->setUniform((name + ".ka").c_str(), ka);
-    prog->setUniform((name + ".ks").c_str(), ks);
-    prog->setUniform((name + ".shiny").c_str(), shiny);
-    prog->setUniform((name + ".toon").c_str(), toon);
+    prog->setUniform((name + ".color").c_str(), color);
+    prog->setUniform((name + ".rough").c_str(), rough);
+    prog->setUniform((name + ".metal").c_str(), metal);
   }
 };

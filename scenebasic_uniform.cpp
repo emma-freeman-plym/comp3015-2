@@ -39,12 +39,8 @@ void SceneBasic_Uniform::initScene(void *win) {
   projection = mat4(1.0f);
 
   // Set lighting uniforms
-  vec3 v = vec3(0.2f, 0.3f, 0.3f);
-  LightInfo lights[] = {
-      {view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(0.5f), vec3(0.4f),
-       vec3(0.5f)},
-      {view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), v, v, v},
-  };
+  LightInfo lights[] = {{view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50},
+                        {view * glm::vec4(0.0f, -1.0f, 2.0f, 1.0f), 35}};
   unsigned int num_lights = sizeof(lights) / sizeof(lights[0]);
 
   for (int i = 0; i < num_lights; i++) {
@@ -144,7 +140,7 @@ void SceneBasic_Uniform::update(float t) {
           "",
           "",
           "",
-          MaterialInfo{vec3(0.5), vec3(0.5), vec3(1.0), 100.0},
+          MaterialInfo{vec3(0.5), 0.5, false},
       });
     }
     ImGui::SameLine();
@@ -228,11 +224,9 @@ void SceneBasic_Uniform::update(float t) {
 
         ImGui::SeparatorText("Material");
 
-        ImGui::ColorEdit3("Kd", glm::value_ptr(obj.mat.kd));
-        ImGui::ColorEdit3("Ka", glm::value_ptr(obj.mat.ka));
-        ImGui::ColorEdit3("Ks", glm::value_ptr(obj.mat.ks));
-        ImGui::SliderFloat("Shininess", &obj.mat.shiny, 0.1, 500);
-        ImGui::Checkbox("Toon", &obj.mat.toon);
+        ImGui::ColorEdit3("Color", glm::value_ptr(obj.mat.color));
+        ImGui::SliderFloat("Roughness", &obj.mat.rough, 0.0, 1.0);
+        ImGui::Checkbox("Metal", &obj.mat.metal);
       }
 
       ImGui::End();
