@@ -11,6 +11,9 @@ struct Material {
   float rough;
   bool metal;
 
+  Material(glm::vec3 color, float rough, bool metal)
+      : color(color), rough(rough), metal(metal) {}
+
   void setUniform(GLSLProgram *prog, std::string name) {
     prog->setUniform((name + ".color").c_str(), color);
     prog->setUniform((name + ".rough").c_str(), rough);
