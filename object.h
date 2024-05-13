@@ -1,5 +1,6 @@
 #pragma once
 
+#include "helper/json/json.hpp"
 #include "helper/objmesh.h"
 #include "shader.h"
 #include <GLFW/glfw3.h>
@@ -10,6 +11,7 @@
 
 using glm::mat4;
 using glm::vec3;
+using json = nlohmann::json;
 
 struct Object {
   std::string name;
@@ -31,5 +33,37 @@ struct Object {
     model = glm::rotate(model, glm::radians(rot.y), vec3(0, 1, 0));
     model = glm::rotate(model, glm::radians(rot.z), vec3(0, 0, 1));
     return model;
+  }
+
+  json serialize() {
+    return {{"name", name},
+            {"mesh", mesh},
+            {"diffuse", diffuse},
+            {"overlay", overlay},
+            {"opacity", opacity},
+            {"mat",
+             {{"kd", {mat.kd.x, mat.kd.y, mat.kd.z}},
+              {"ka", {mat.ka.x, mat.ka.y, mat.ka.z}},
+              {"ks", {mat.ks.x, mat.ks.y, mat.ks.z}},
+              {"shiny", mat.shiny},
+              {"toon", mat.toon}}},
+            {"pos", {pos.x, pos.y, pos.z}},
+            {"rot", {rot.x, rot.y, rot.z}},
+            {"scale", {scale.x, scale.y, scale.z}}};
+  }
+
+  static Object deserialize(json j) {
+    return {j["name"],
+            j["mesh"],
+            j["diffuse"],
+            j["overlay"],
+            j["opacity"],
+            {glm::vec3(j["mat"]["kd"][0], j["mat"]["kd"][1], j["mat"]["kd"][2]),
+             glm::vec3(j["mat"]["ka"][0], j["mat"]["ka"][1], j["mat"]["ka"][2]),
+             glm::vec3(j["mat"]["ks"][0], j["mat"]["ks"][1], j["mat"]["ks"][2]),
+             j["mat"]["shiny"], j["mat"]["toon"]},
+            {j["pos"][0], j["pos"][1], j["pos"][2]},
+            {j["rot"][0], j["rot"][1], j["rot"][2]},
+            {j["scale"][0], j["scale"][1], j["scale"][2]}};
   }
 };

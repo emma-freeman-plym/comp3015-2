@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -30,14 +31,7 @@ void SceneBasic_Uniform::initScene(void *win) {
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
-  objects = {
-      Object{"chess", "media/chess_piece.obj",
-             "media/Substance_Graph_BaseColor.jpg",
-             "media/Surface_Imperfections_Cracks_001_basecolor.jpg",
-             "media/Surface_Imperfections_Cracks_001_opacity.jpg",
-             MaterialInfo{vec3(0.2f, 0.55f, 0.9f), vec3(0.2f, 0.55f, 0.9f),
-                          vec3(1.0f), 100.0f}},
-  };
+  objects = {};
 
   // Set up projection matrices
   model = mat4(1.0f);
@@ -93,6 +87,48 @@ void SceneBasic_Uniform::update(float t) {
 
   {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(200, 150));
+    ImGui::Begin("Scene");
+
+    ImVec2 size = ImVec2(-FLT_MIN, 0.0f);
+    const char *filter[1] = {"*.json"};
+
+    if (ImGui::Button("Save", size)) {
+      char const *file =
+          tinyfd_saveFileDialog("Save Scene", NULL, 1, filter, NULL);
+
+      if (file) {
+        json j;
+        for (auto &obj : objects) {
+          j.push_back(obj.serialize());
+        }
+        std::ofstream out(file);
+        out << j << std::endl;
+        out.close();
+      }
+    }
+
+    if (ImGui::Button("Load", size)) {
+      char const *file =
+          tinyfd_openFileDialog("Load Scene", NULL, 1, filter, NULL, 0);
+
+      if (file) {
+        std::ifstream in(file);
+        json j;
+        in >> j;
+        in.close();
+        objects.clear();
+        for (auto &obj : j) {
+          objects.push_back(Object::deserialize(obj));
+        }
+      }
+    }
+
+    ImGui::End();
+  }
+
+  {
+    ImGui::SetNextWindowPos(ImVec2(0, 150));
     ImGui::SetNextWindowSize(ImVec2(200, 400));
     ImGui::Begin("Objects");
 
