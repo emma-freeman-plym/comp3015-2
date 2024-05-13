@@ -42,7 +42,8 @@ void SceneBasic_Uniform::initScene(void *win) {
   projection = mat4(1.0f);
 
   // Set lighting uniforms
-  lights = {Light(POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(50))};
+  lights = {Light("Default light", POINT,
+                  view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(50))};
 
   // Setup ImGui context
   IMGUI_CHECKVERSION();
@@ -122,7 +123,7 @@ void SceneBasic_Uniform::update(float t) {
     ImVec2 half = ImVec2(w / 2, 0.0f);
 
     if (ImGui::Button("Add", half)) {
-      objects.push_back(Object("new object", "media/cube.obj", "", "", "",
+      objects.push_back(Object("New object", "media/cube.obj", "", "", "",
                                Material(vec3(0.5), 0.5, false), vec3(0.0),
                                vec3(0.0), vec3(1.0)));
     }
@@ -152,7 +153,7 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::SeparatorText("Lights");
 
     if (ImGui::Button("Add", half)) {
-      lights.push_back(Light(POINT, vec3(0.0), vec3(50.0)));
+      lights.push_back(Light("New light", POINT, vec3(0.0), vec3(50.0)));
     }
     ImGui::SameLine();
     if (ImGui::Button("Remove", half)) {
@@ -166,7 +167,7 @@ void SceneBasic_Uniform::update(float t) {
       auto i = 0;
       for (auto &light : lights) {
         auto sel = light_index == i;
-        if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), sel)) {
+        if (ImGui::Selectable(light.name.c_str(), sel)) {
           selected = &lights[i];
           light_index = i;
         }
@@ -251,7 +252,8 @@ void Light::properties() {
   ImVec2 size = ImVec2(-FLT_MIN, 0);
   const char *kinds[] = {"Point", "Directional"};
 
-  ImGui::Combo("combo", (int *)&kind, kinds, -1);
+  ImGui::InputText("Name", &name);
+  ImGui::Combo("combo", (int *)&kind, kinds, 2);
   ImGui::DragFloat3("Position", glm::value_ptr(position), 1.0, -5, 5);
   ImGui::DragFloat3("Intensity", glm::value_ptr(intensity), 1.0, 0, 100);
 }

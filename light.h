@@ -11,12 +11,14 @@ using json = nlohmann::json;
 enum LightKind { POINT, DIRECTIONAL };
 
 struct Light : Editable {
+  std::string name;
   LightKind kind;
   glm::vec3 position = glm::vec3(0.0);
   glm::vec3 intensity = glm::vec3(50.0);
 
-  Light(LightKind kind, glm::vec3 position, glm::vec3 intensity)
-      : kind(kind), position(position), intensity(intensity) {}
+  Light(std::string name, LightKind kind, glm::vec3 position,
+        glm::vec3 intensity)
+      : name(name), kind(kind), position(position), intensity(intensity) {}
 
   void properties();
 
@@ -27,6 +29,7 @@ struct Light : Editable {
 
   json serialize() {
     return {
+        {"name", name},
         {"kind", kind},
         {"position", {position.x, position.y, position.z}},
         {"intensity", {intensity.x, intensity.y, intensity.z}},
@@ -34,7 +37,7 @@ struct Light : Editable {
   }
 
   static Light deserialize(json j) {
-    return Light(j["kind"],
+    return Light(j["name"], j["kind"],
                  {j["position"][0], j["position"][1], j["position"][2]},
                  {j["intensity"][0], j["intensity"][1], j["intensity"][2]});
   }
