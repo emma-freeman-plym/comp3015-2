@@ -86,7 +86,7 @@ vec3 microfacet(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
         geom_smith(mat, ndl) *
         geom_smith(mat, ndv);
 
-    return (diffuse_brdf + pi * spec_brdf) * ndl;
+    return (diffuse_brdf + pi * spec_brdf) * ndl * i;
 }
 
 void main() {

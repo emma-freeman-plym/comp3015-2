@@ -42,13 +42,7 @@ void SceneBasic_Uniform::initScene(void *win) {
   projection = mat4(1.0f);
 
   // Set lighting uniforms
-  lights = {Light(POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), 50)};
-  unsigned int num_lights = lights.size();
-
-  for (int i = 0; i < num_lights; i++) {
-    lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
-  }
-  prog.setUniform("num_lights", num_lights);
+  lights = {Light(POINT, view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(50))};
 
   // Setup ImGui context
   IMGUI_CHECKVERSION();
@@ -134,18 +128,47 @@ void SceneBasic_Uniform::update(float t) {
     }
     ImGui::SameLine();
     if (ImGui::Button("Remove", half)) {
-      if (0 <= select_index && select_index < objects.size()) {
-        objects.erase(objects.begin() + select_index);
-        select_index = -1;
+      if (0 <= obj_index && obj_index < objects.size()) {
+        objects.erase(objects.begin() + obj_index);
+        obj_index = -1;
       }
     }
 
     if (ImGui::BeginListBox("objects", ImVec2(-FLT_MIN, 200))) {
       auto i = 0;
       for (auto &obj : objects) {
-        auto sel = select_index == i;
+        auto sel = obj_index == i;
         if (ImGui::Selectable(obj.name.c_str(), sel)) {
-          select_index = i;
+          selected = &objects[i];
+          obj_index = i;
+        }
+        if (sel)
+          ImGui::SetItemDefaultFocus();
+        i++;
+      }
+      ImGui::EndListBox();
+    }
+
+    ImGui::SeparatorText("Lights");
+
+    if (ImGui::Button("Add", half)) {
+      lights.push_back(Light(POINT, vec3(0.0), vec3(50.0)));
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Remove", half)) {
+      if (0 <= light_index && light_index < lights.size()) {
+        lights.erase(lights.begin() + light_index);
+        light_index = -1;
+      }
+    }
+
+    if (ImGui::BeginListBox("lights", ImVec2(-FLT_MIN, 200))) {
+      auto i = 0;
+      for (auto &light : lights) {
+        auto sel = light_index == i;
+        if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), sel)) {
+          selected = &lights[i];
+          light_index = i;
         }
         if (sel)
           ImGui::SetItemDefaultFocus();
@@ -162,13 +185,11 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::SetNextWindowSize(ImVec2(200, 400));
     ImGui::Begin("Properties");
 
-    if (0 <= select_index && select_index <= objects.size()) {
-      auto &obj = objects[select_index];
-      obj.properties();
-    }
-  }
+    if (selected)
+      selected->properties();
 
-  ImGui::End();
+    ImGui::End();
+  }
 }
 
 void Object::properties() {
@@ -226,6 +247,15 @@ void Object::properties() {
   ImGui::Checkbox("Metal", &mat.metal);
 }
 
+void Light::properties() {
+  ImVec2 size = ImVec2(-FLT_MIN, 0);
+  const char *kinds[] = {"Point", "Directional"};
+
+  ImGui::Combo("combo", (int *)&kind, kinds, -1);
+  ImGui::DragFloat3("Position", glm::value_ptr(position), 1.0, -5, 5);
+  ImGui::DragFloat3("Intensity", glm::value_ptr(intensity), 1.0, 0, 100);
+}
+
 void SceneBasic_Uniform::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -237,6 +267,13 @@ void SceneBasic_Uniform::render() {
   // prog.setUniform("lights[0].position",
   //                 base * glm::rotate(mat4(1.0f), glm::radians(rotation),
   //                                    vec3(0.0f, 1.0f, 0.0f)));
+
+  unsigned int num_lights = lights.size();
+
+  for (int i = 0; i < num_lights; i++) {
+    lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
+  }
+  prog.setUniform("num_lights", num_lights);
 
   for (auto &obj : objects) {
     model = obj.matrix();

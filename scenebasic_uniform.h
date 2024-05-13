@@ -19,7 +19,9 @@ private:
   std::vector<Light> lights;
   TextureCache tex_cache;
   MeshCache mesh_cache;
-  int select_index = -1;
+  int obj_index = -1;
+  int light_index = -1;
+  Editable *selected = nullptr;
 
   float time;
 

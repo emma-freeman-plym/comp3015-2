@@ -10,13 +10,15 @@ using json = nlohmann::json;
 
 enum LightKind { POINT, DIRECTIONAL };
 
-struct Light {
+struct Light : Editable {
   LightKind kind;
   glm::vec3 position = glm::vec3(0.0);
-  float intensity = 50.0;
+  glm::vec3 intensity = glm::vec3(50.0);
 
-  Light(LightKind kind, glm::vec3 position, float intensity)
+  Light(LightKind kind, glm::vec3 position, glm::vec3 intensity)
       : kind(kind), position(position), intensity(intensity) {}
+
+  void properties();
 
   void setUniform(GLSLProgram *prog, std::string name) {
     prog->setUniform((name + ".position").c_str(), position);
@@ -27,12 +29,13 @@ struct Light {
     return {
         {"kind", kind},
         {"position", {position.x, position.y, position.z}},
-        {"intensity", intensity},
+        {"intensity", {intensity.x, intensity.y, intensity.z}},
     };
   }
 
   static Light deserialize(json j) {
-    return Light(j["kind"], {j["pos"][0], j["pos"][1], j["pos"][2]},
-                 j["intensity"]);
+    return Light(j["kind"],
+                 {j["position"][0], j["position"][1], j["position"][2]},
+                 {j["intensity"][0], j["intensity"][1], j["intensity"][2]});
   }
 };
