@@ -220,22 +220,29 @@ void SceneBasic_Uniform::render() {
     model = obj.matrix();
     setMatrices();
     glActiveTexture(GL_TEXTURE0);
-    if (obj.diffuse.length() > 0)
+    if (obj.diffuse.length() > 0) {
+      prog.setUniform("material.diffuse", true);
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.diffuse));
-    else
+    } else {
+      prog.setUniform("material.diffuse", false);
       glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     glActiveTexture(GL_TEXTURE1);
-    if (obj.overlay.length() > 0)
+    if (obj.overlay.length() > 0) {
+      prog.setUniform("material.overlay", true);
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.overlay));
-    else
+    } else {
+      prog.setUniform("material.overlay", false);
       glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     glActiveTexture(GL_TEXTURE2);
-    if (obj.opacity.length() > 0)
+    if (obj.opacity.length() > 0) {
       glBindTexture(GL_TEXTURE_2D, tex_cache.get(obj.opacity));
-    else
+    } else {
       glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     obj.mat.setUniform(&prog, "material");
     mesh_cache.get(obj.mesh)->render();

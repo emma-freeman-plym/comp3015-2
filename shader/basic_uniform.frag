@@ -33,6 +33,8 @@ uniform struct MaterialInfo {
     vec3 ks;
     float shiny;
     bool toon;
+    bool diffuse;
+    bool overlay;
 } material;
 
 float toon(float x, bool y) {
@@ -45,7 +47,7 @@ vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
     vec3 diffuse_color = texture(diffuse_tex, tex_coord).rgb;
     vec3 overlay_color = texture(overlay_tex, tex_coord).rgb;
     float opacity = texture(opacity_tex, tex_coord).x;
-    vec3 tex_color = mix(diffuse_color, overlay_color, opacity);
+    vec3 tex_color = mat.overlay ? mix(diffuse_color, overlay_color, opacity) : diffuse_color;
 
     vec3 s = normalize(vec3(light.position.xyz - pos));
     float sdn = max(dot(s, normal), 0.0);
@@ -53,8 +55,8 @@ vec3 phong(LightInfo light, MaterialInfo mat, vec3 pos, vec3 normal) {
     vec3 r = reflect(-s, normal);
 
     // Sum of Phong components
-    vec3 ambient = light.la * tex_color;
-    vec3 diffuse = light.ld * tex_color * toon(sdn, mat.toon);
+    vec3 ambient = light.la * (mat.diffuse ? tex_color : mat.ka);
+    vec3 diffuse = light.ld * (mat.diffuse ? tex_color : mat.kd) * toon(sdn, mat.toon);
     vec3 specular = light.ls * mat.ks * toon(pow(max(dot(r, v), 0.0), mat.shiny), mat.toon);
     return ambient + diffuse + specular;
 }
