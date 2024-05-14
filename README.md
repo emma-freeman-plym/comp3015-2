@@ -1,7 +1,7 @@
 # COMP3015 OpenGL Scene Editor
 
 <p align="center">
-    <img src="https://github.com/emma-freeman-plym/comp3015-2/blob/main/preview.png?raw=true">
+    <img src="https://github.com/emma-freeman-plym/comp3015-2/blob/main/preview2.png?raw=true">
 </p>
 
 This project implements a level editor for designing 3D scenes using OpenGL.
