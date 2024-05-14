@@ -6,8 +6,7 @@
 #include "helper/scene.h"
 
 #include "cache.h"
-#include "light.h"
-#include "object.h"
+#include "level.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -17,8 +16,7 @@ enum Select { NONE, OBJECT, LIGHT };
 class SceneBasic_Uniform : public Scene {
 private:
   GLSLProgram prog;
-  std::vector<Object> objects;
-  std::vector<Light> lights;
+  Level level;
   TextureCache tex_cache;
   MeshCache mesh_cache;
   Select select;

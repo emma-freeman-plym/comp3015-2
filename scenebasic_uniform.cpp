@@ -34,16 +34,14 @@ void SceneBasic_Uniform::initScene(void *win) {
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
-  objects = {};
+  level = Level();
+  level.lights.push_back(
+      Light("Default light", POINT, vec3(5.0f, 5.0f, 2.0f), vec3(50.0)));
 
   // Set up projection matrices
   model = mat4(1.0f);
   view = glm::lookAt(vec3(0.0, 3.0, 0.3), vec3(0.0), vec3(0.0, 1.0, 0.0));
   projection = mat4(1.0f);
-
-  // Set lighting uniforms
-  lights = {Light("Default light", POINT,
-                  view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f), vec3(50))};
 
   // Setup ImGui context
   IMGUI_CHECKVERSION();
@@ -91,12 +89,8 @@ void SceneBasic_Uniform::update(float t) {
           tinyfd_saveFileDialog("Save Scene", NULL, 1, filter, NULL);
 
       if (file) {
-        json j;
-        for (auto &obj : objects) {
-          j.push_back(obj.serialize());
-        }
         std::ofstream out(file);
-        out << j << std::endl;
+        out << level.serialize() << std::endl;
         out.close();
       }
     }
@@ -110,10 +104,7 @@ void SceneBasic_Uniform::update(float t) {
         json j;
         in >> j;
         in.close();
-        objects.clear();
-        for (auto &obj : j) {
-          objects.push_back(Object::deserialize(obj));
-        }
+        level = Level::deserialize(j);
       }
     }
 
@@ -123,21 +114,21 @@ void SceneBasic_Uniform::update(float t) {
     ImVec2 half = ImVec2(w / 2, 0.0f);
 
     if (ImGui::Button("Add##objects", half)) {
-      objects.push_back(Object("New object", "media/cube.obj", "", "", "",
-                               Material(vec3(0.5), 0.5, false), vec3(0.0),
-                               vec3(0.0), vec3(1.0)));
+      level.objects.push_back(Object("New object", "media/cube.obj", "", "", "",
+                                     Material(vec3(0.5), 0.5, false), vec3(0.0),
+                                     vec3(0.0), vec3(1.0)));
     }
     ImGui::SameLine();
     if (ImGui::Button("Remove##objects", half)) {
       if (select == OBJECT) {
-        objects.erase(objects.begin() + select_index);
+        level.objects.erase(level.objects.begin() + select_index);
         select = NONE;
       }
     }
 
     if (ImGui::BeginListBox("objects", ImVec2(-FLT_MIN, 200))) {
       auto i = 0;
-      for (auto &obj : objects) {
+      for (auto &obj : level.objects) {
         auto sel = select == OBJECT && select_index == i;
         auto name = obj.name + "##" + std::to_string(i);
         if (ImGui::Selectable(name.c_str(), sel)) {
@@ -154,21 +145,21 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::SeparatorText("Lights");
 
     if (ImGui::Button("Add##lights", half)) {
-      lights.push_back(Light("New light", POINT,
-                             view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f),
-                             vec3(50.0)));
+      level.lights.push_back(Light("New light", POINT,
+                                   view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f),
+                                   vec3(50.0)));
     }
     ImGui::SameLine();
     if (ImGui::Button("Remove##lights", half)) {
       if (select == LIGHT) {
-        lights.erase(lights.begin() + select_index);
+        level.lights.erase(level.lights.begin() + select_index);
         select = NONE;
       }
     }
 
     if (ImGui::BeginListBox("lights", ImVec2(-FLT_MIN, 200))) {
       auto i = 0;
-      for (auto &light : lights) {
+      for (auto &light : level.lights) {
         auto sel = select == LIGHT && select_index == i;
         auto name = light.name + "##" + std::to_string(i);
         if (ImGui::Selectable(name.c_str(), sel)) {
@@ -191,7 +182,7 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::Begin("Properties");
 
     if (select == OBJECT) {
-      Object *obj = &objects[select_index];
+      Object *obj = &level.objects[select_index];
 
       ImVec2 size = ImVec2(-FLT_MIN, 0);
 
@@ -246,7 +237,7 @@ void SceneBasic_Uniform::update(float t) {
       ImGui::SliderFloat("Roughness", &obj->mat.rough, 0.0, 1.0);
       ImGui::Checkbox("Metal", &obj->mat.metal);
     } else if (select == LIGHT) {
-      Light *light = &lights[select_index];
+      Light *light = &level.lights[select_index];
       ImVec2 size = ImVec2(-FLT_MIN, 0);
       const char *kinds[] = {"Point", "Directional"};
 
@@ -274,14 +265,14 @@ void SceneBasic_Uniform::render() {
   //                 base * glm::rotate(mat4(1.0f), glm::radians(rotation),
   //                                    vec3(0.0f, 1.0f, 0.0f)));
 
-  unsigned int num_lights = lights.size();
+  unsigned int num_lights = level.lights.size();
 
   for (int i = 0; i < num_lights; i++) {
-    lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
+    level.lights[i].setUniform(&prog, "lights[" + std::to_string(i) + "]");
   }
   prog.setUniform("num_lights", num_lights);
 
-  for (auto &obj : objects) {
+  for (auto &obj : level.objects) {
     model = obj.matrix();
     setMatrices();
     glActiveTexture(GL_TEXTURE0);
