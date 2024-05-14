@@ -40,7 +40,6 @@ void SceneBasic_Uniform::initScene(void *win) {
 
   // Set up projection matrices
   model = mat4(1.0f);
-  view = glm::lookAt(vec3(0.0, 3.0, 0.3), vec3(0.0), vec3(0.0, 1.0, 0.0));
   projection = mat4(1.0f);
 
   // Setup ImGui context
@@ -108,6 +107,10 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
+    ImGui::SeparatorText("Camera");
+    ImGui::DragFloat3("Orbit", glm::value_ptr(level.orbit), 1.0, -360, 360);
+    ImGui::DragFloat("Dist", &level.dist, 0.1, 0.1, 20.0);
+
     ImGui::SeparatorText("Objects");
 
     float w = ImGui::GetWindowWidth() - ImGui::GetStyle().ItemSpacing.x * 3;
@@ -126,7 +129,7 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
-    if (ImGui::BeginListBox("objects", ImVec2(-FLT_MIN, 200))) {
+    if (ImGui::BeginListBox("##objects", ImVec2(-FLT_MIN, 150))) {
       auto i = 0;
       for (auto &obj : level.objects) {
         auto sel = select == OBJECT && select_index == i;
@@ -157,7 +160,7 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
-    if (ImGui::BeginListBox("lights", ImVec2(-FLT_MIN, 200))) {
+    if (ImGui::BeginListBox("##lights", ImVec2(-FLT_MIN, 150))) {
       auto i = 0;
       for (auto &light : level.lights) {
         auto sel = select == LIGHT && select_index == i;
@@ -259,11 +262,13 @@ void SceneBasic_Uniform::render() {
   // Set time
   prog.setUniform("time", time);
 
-  // Rotate the 0th light
-  // glm::vec4 base = glm::vec4(5.0f, 5.0f, 2.0f, 1.0f);
-  // prog.setUniform("lights[0].position",
-  //                 base * glm::rotate(mat4(1.0f), glm::radians(rotation),
-  //                                    vec3(0.0f, 1.0f, 0.0f)));
+  // Set up view matrix
+  mat4 v = glm::lookAt(vec3(0.0f, 0.0f, level.dist), vec3(0.0f),
+                       vec3(0.0f, 1.0f, 0.0f));
+  v = glm::rotate(v, glm::radians(level.orbit.x), vec3(1.0f, 0.0f, 0.0f));
+  v = glm::rotate(v, glm::radians(level.orbit.y), vec3(0.0f, 1.0f, 0.0f));
+  v = glm::rotate(v, glm::radians(level.orbit.z), vec3(0.0f, 0.0f, 1.0f));
+  view = v;
 
   unsigned int num_lights = level.lights.size();
 
