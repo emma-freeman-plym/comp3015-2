@@ -21,7 +21,8 @@ private:
   MeshCache mesh_cache;
   Select select;
   unsigned int select_index = 0;
-
+  glm::mat4 viewport;
+  bool wireframe;
   float time;
 
   void compile();

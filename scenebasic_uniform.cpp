@@ -59,6 +59,7 @@ void SceneBasic_Uniform::compile() {
   try {
     prog.compileShader("shader/basic_uniform.vert");
     prog.compileShader("shader/basic_uniform.frag");
+    prog.compileShader("shader/basic_uniform.gs");
     prog.link();
     prog.use();
   } catch (GLSLProgramException &e) {
@@ -117,6 +118,9 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::SeparatorText("Camera");
     ImGui::DragFloat3("Orbit", glm::value_ptr(level.orbit), 1.0, -360, 360);
     ImGui::DragFloat("Dist", &level.dist, 0.1, 0.1, 20.0);
+
+    ImGui::SeparatorText("Debug");
+    ImGui::Checkbox("Wireframe", &wireframe);
 
     ImGui::SeparatorText("Objects");
 
@@ -286,8 +290,9 @@ void SceneBasic_Uniform::update(float t) {
 void SceneBasic_Uniform::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Set time
+  // Set uniforms
   prog.setUniform("time", time);
+  prog.setUniform("wireframe", wireframe);
 
   // Set up view matrix
   mat4 v = glm::lookAt(vec3(0.0f, 0.0f, level.dist), vec3(0.0f),
@@ -349,6 +354,12 @@ void SceneBasic_Uniform::resize(int w, int h) {
   glViewport(0, 0, w, h);
   projection =
       glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
+
+  float w2 = w / 2.0f;
+  float h2 = h / 2.0f;
+  viewport = mat4(
+      glm::vec4(w2, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, h2, 0.0f, 0.0f),
+      glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(w2 + 0, h2 + 0, 0.0f, 1.0f));
 }
 
 void SceneBasic_Uniform::setMatrices() {
@@ -358,4 +369,5 @@ void SceneBasic_Uniform::setMatrices() {
   prog.setUniform("normal_matrix",
                   glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
   prog.setUniform("model_view_projection", projection * mv);
+  prog.setUniform("viewport_matrix", viewport);
 }

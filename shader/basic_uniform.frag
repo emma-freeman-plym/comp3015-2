@@ -5,10 +5,13 @@ const uint max_lights = 5;
 const uint toon_levels = 3;
 const float toon_sf = 1.0 / toon_levels;
 
+const float line_weight = 0.75;
+
 const float pi = 3.141592653589793238462643383279502;
 
-in vec3 position;
-in vec3 normal;
+in vec3 g_position;
+in vec3 g_normal;
+noperspective in vec3 g_edge_distance;
 in vec2 tex_coord;
 
 layout(location = 0) out vec4 color;
@@ -38,6 +41,9 @@ uniform struct MaterialInfo {
     float velocity;
     float amplitude;
 } material;
+
+uniform bool wireframe;
+
 float toon(float x, bool y) {
     return y ? floor(x * toon_levels) * toon_sf : x;
 }
@@ -83,7 +89,7 @@ vec3 microfacet(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
         l = normalize(light.position);
     }
 
-    vec3 v = normalize(-position);
+    vec3 v = normalize(-pos);
     vec3 h = normalize(v + l);
     float ndh = dot(n, h);
     float ldh = dot(l, h);
@@ -101,10 +107,26 @@ vec3 microfacet(LightInfo light, MaterialInfo mat, vec3 pos, vec3 n) {
 
 void main() {
     vec3 sum = vec3(0.0);
-    vec3 n = normalize(normal);
+    vec3 n = normalize(g_normal);
     for(int i = 0; i < num_lights; i++) {
-        sum += microfacet(lights[i], material, position, n);
+        sum += microfacet(lights[i], material, g_position, n);
     }
     sum = pow(sum, vec3(1.0 / 2.2));
+
     color = vec4(sum, 1.0);
+
+    if (wireframe) {
+        float d = min(g_edge_distance.x, g_edge_distance.y);
+        d = min(d, g_edge_distance.z);
+        float c;
+        if (d < line_weight - 1.0) {
+            c = 1.0;
+        } else if (d > line_weight + 1.0) {
+            c = 0.0;
+        } else {
+            float x = d - (line_weight - 1);
+            c = exp2(-2.0 * (x * x));
+        }
+        color = mix(color, vec4(0.1, 0.1, 0.1, 1.0), c);
+    }
 }
