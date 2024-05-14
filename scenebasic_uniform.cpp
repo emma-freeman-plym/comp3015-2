@@ -84,8 +84,12 @@ void SceneBasic_Uniform::update(float t) {
     const char *filter[1] = {"*.json"};
 
     if (ImGui::Button("Save", full)) {
-      char const *file =
-          tinyfd_saveFileDialog("Save Scene", NULL, 1, filter, NULL);
+
+      char const *file = NULL;
+      try {
+        file = tinyfd_saveFileDialog("Save Scene", NULL, 1, filter, NULL);
+      } catch (...) {
+      }
 
       if (file) {
         std::ofstream out(file);
@@ -95,8 +99,11 @@ void SceneBasic_Uniform::update(float t) {
     }
 
     if (ImGui::Button("Load", full)) {
-      char const *file =
-          tinyfd_openFileDialog("Load Scene", NULL, 1, filter, NULL, 0);
+      char const *file = NULL;
+      try {
+        file = tinyfd_openFileDialog("Load Scene", NULL, 1, filter, NULL, 0);
+      } catch (...) {
+      }
 
       if (file) {
         std::ifstream in(file);
@@ -195,8 +202,12 @@ void SceneBasic_Uniform::update(float t) {
       ImGui::InputText("Name", &obj->name);
 
       if (ImGui::Button("Mesh", size)) {
-        char const *file = tinyfd_openFileDialog("Select file", NULL, 2,
-                                                 mesh_filters, NULL, 0);
+        char const *file = NULL;
+        try {
+          file = tinyfd_openFileDialog("Select file", NULL, 2, mesh_filters,
+                                       NULL, 0);
+        } catch (...) {
+        }
         if (file)
           obj->mesh = std::string(file);
       }
@@ -204,24 +215,33 @@ void SceneBasic_Uniform::update(float t) {
       ImGui::SeparatorText("Textures");
 
       if (ImGui::Button("Diffuse", size)) {
-        char const *file =
-            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        char const *file = NULL;
+        try {
+          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        } catch (...) {
+        }
         if (file)
           obj->diffuse = std::string(file);
         else
           obj->diffuse = "";
       }
       if (ImGui::Button("Overlay", size)) {
-        char const *file =
-            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        char const *file = NULL;
+        try {
+          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        } catch (...) {
+        }
         if (file)
           obj->overlay = std::string(file);
         else
           obj->overlay = "";
       }
       if (ImGui::Button("Opacity", size)) {
-        char const *file =
-            tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        char const *file = NULL;
+        try {
+          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+        } catch (...) {
+        }
         if (file)
           obj->opacity = std::string(file);
         else
