@@ -12,7 +12,7 @@ const float pi = 3.141592653589793238462643383279502;
 in vec3 g_position;
 in vec3 g_normal;
 noperspective in vec3 g_edge_distance;
-in vec2 tex_coord;
+in vec2 g_tex_coord;
 
 layout(location = 0) out vec4 color;
 
@@ -49,9 +49,9 @@ float toon(float x, bool y) {
 }
 
 vec3 get_color(MaterialInfo mat) {
-    vec3 diffuse_color = texture(diffuse_tex, tex_coord).rgb;
-    vec3 overlay_color = texture(overlay_tex, tex_coord).rgb;
-    float opacity = texture(opacity_tex, tex_coord).x;
+    vec3 diffuse_color = texture(diffuse_tex, g_tex_coord).rgb;
+    vec3 overlay_color = texture(overlay_tex, g_tex_coord).rgb;
+    float opacity = texture(opacity_tex, g_tex_coord).x;
     vec3 tex_color = mat.overlay ? mix(diffuse_color, overlay_color, opacity) : diffuse_color;
     return mat.diffuse ? tex_color : mat.color;
 }

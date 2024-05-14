@@ -221,7 +221,8 @@ void SceneBasic_Uniform::update(float t) {
       if (ImGui::Button("Diffuse", size)) {
         char const *file = NULL;
         try {
-          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+          file = tinyfd_openFileDialog("Select file", NULL, 2, tex_filters,
+                                       NULL, 0);
         } catch (...) {
         }
         if (file)
@@ -232,7 +233,8 @@ void SceneBasic_Uniform::update(float t) {
       if (ImGui::Button("Overlay", size)) {
         char const *file = NULL;
         try {
-          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+          file = tinyfd_openFileDialog("Select file", NULL, 2, tex_filters,
+                                       NULL, 0);
         } catch (...) {
         }
         if (file)
@@ -243,7 +245,8 @@ void SceneBasic_Uniform::update(float t) {
       if (ImGui::Button("Opacity", size)) {
         char const *file = NULL;
         try {
-          tinyfd_openFileDialog("Select file", NULL, 2, tex_filters, NULL, 0);
+          file = tinyfd_openFileDialog("Select file", NULL, 2, tex_filters,
+                                       NULL, 0);
         } catch (...) {
         }
         if (file)
