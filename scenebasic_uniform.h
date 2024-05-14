@@ -12,6 +12,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+enum Select { NONE, OBJECT, LIGHT };
+
 class SceneBasic_Uniform : public Scene {
 private:
   GLSLProgram prog;
@@ -19,9 +21,8 @@ private:
   std::vector<Light> lights;
   TextureCache tex_cache;
   MeshCache mesh_cache;
-  int obj_index = -1;
-  int light_index = -1;
-  Editable *selected = nullptr;
+  Select select;
+  unsigned int select_index = 0;
 
   float time;
 

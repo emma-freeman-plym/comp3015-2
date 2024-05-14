@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "editable.h"
+
 #include "material.h"
 #include "scenebasic_uniform.h"
 
@@ -14,7 +14,7 @@ using glm::mat4;
 using glm::vec3;
 using json = nlohmann::json;
 
-struct Object : Editable {
+struct Object {
   std::string name;
   std::string mesh;
   std::string diffuse;

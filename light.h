@@ -4,13 +4,11 @@
 #include "helper/json/json.hpp"
 #include <glm/glm.hpp>
 
-#include "editable.h"
-
 using json = nlohmann::json;
 
 enum LightKind { POINT, DIRECTIONAL };
 
-struct Light : Editable {
+struct Light {
   std::string name;
   LightKind kind;
   glm::vec3 position = glm::vec3(0.0);
