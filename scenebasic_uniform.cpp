@@ -32,11 +32,11 @@ void SceneBasic_Uniform::initScene(void *win) {
   // Compile shaders
   compile();
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0.192f, 0.212f, 0.247f, 1.0f);
 
   level = Level();
   level.lights.push_back(
       Light("Default light", POINT, vec3(5.0f, 5.0f, 2.0f), vec3(50.0)));
+  level.background = vec3(0.192f, 0.212f, 0.247f);
 
   // Set up projection matrices
   model = mat4(1.0f);
@@ -118,6 +118,7 @@ void SceneBasic_Uniform::update(float t) {
     ImGui::SeparatorText("Camera");
     ImGui::DragFloat3("Orbit", glm::value_ptr(level.orbit), 1.0, -360, 360);
     ImGui::DragFloat("Dist", &level.dist, 0.1, 0.1, 20.0);
+    ImGui::ColorEdit3("Color", glm::value_ptr(level.background));
 
     ImGui::SeparatorText("Debug");
     ImGui::Checkbox("Wireframe", &wireframe);
@@ -140,7 +141,7 @@ void SceneBasic_Uniform::update(float t) {
       }
     }
 
-    if (ImGui::BeginListBox("##objects", ImVec2(-FLT_MIN, 150))) {
+    if (ImGui::BeginListBox("##objects", ImVec2(-FLT_MIN, 120))) {
       auto i = 0;
       for (auto &obj : level.objects) {
         auto sel = select == OBJECT && select_index == i;
@@ -291,6 +292,8 @@ void SceneBasic_Uniform::update(float t) {
 }
 
 void SceneBasic_Uniform::render() {
+  glClearColor(level.background.x, level.background.y, level.background.z,
+               1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Set uniforms
