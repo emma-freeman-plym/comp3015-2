@@ -34,8 +34,10 @@ uniform struct MaterialInfo {
     bool metal;
     bool diffuse;
     bool overlay;
+    float frequency;
+    float velocity;
+    float amplitude;
 } material;
-
 float toon(float x, bool y) {
     return y ? floor(x * toon_levels) * toon_sf : x;
 }

@@ -125,8 +125,8 @@ void SceneBasic_Uniform::update(float t) {
 
     if (ImGui::Button("Add##objects", half)) {
       level.objects.push_back(Object("New object", "media/cube.obj", "", "", "",
-                                     Material(vec3(0.5), 0.5, false), vec3(0.0),
-                                     vec3(0.0), vec3(1.0)));
+                                     Material(vec3(0.5), 0.5, false, 0, 0, 1),
+                                     vec3(0.0), vec3(0.0), vec3(1.0)));
     }
     ImGui::SameLine();
     if (ImGui::Button("Remove##objects", half)) {
@@ -188,7 +188,7 @@ void SceneBasic_Uniform::update(float t) {
 
   {
     ImGui::SetNextWindowPos(ImVec2(1200 - 200, 0));
-    ImGui::SetNextWindowSize(ImVec2(200, 400));
+    ImGui::SetNextWindowSize(ImVec2(200, 450));
     ImGui::Begin("Properties");
 
     if (select == OBJECT) {
@@ -259,6 +259,13 @@ void SceneBasic_Uniform::update(float t) {
       ImGui::ColorEdit3("Color", glm::value_ptr(obj->mat.color));
       ImGui::SliderFloat("Roughness", &obj->mat.rough, 0.0, 1.0);
       ImGui::Checkbox("Metal", &obj->mat.metal);
+
+      ImGui::SeparatorText("Animation");
+
+      ImGui::DragFloat("Frequency", &obj->mat.frequency, 0.1, 0.1, 10.0);
+      ImGui::DragFloat("Velocity", &obj->mat.velocity, 0.1, 0.1, 10.0);
+      ImGui::DragFloat("Amplitude", &obj->mat.amplitude, 0.1, 0.1, 10.0);
+
     } else if (select == LIGHT) {
       Light *light = &level.lights[select_index];
       ImVec2 size = ImVec2(-FLT_MIN, 0);

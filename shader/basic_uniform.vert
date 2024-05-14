@@ -11,28 +11,32 @@ out vec3 normal;
 out vec2 tex_coord;
 
 uniform float time;
-uniform float freq = 4.5;
-uniform float velocity = 3.5;
-uniform float amp = 0.03;
+// const float freq = 4.5;
+// const float velocity = 3.5;
+// const float amp = 0.03;
+
+uniform struct MaterialInfo {
+    vec3 color;
+    float rough;
+    bool metal;
+    bool diffuse;
+    bool overlay;
+    float frequency;
+    float velocity;
+    float amplitude;
+} material;
 
 uniform mat4 model_view_matrix;
 uniform mat4 model_view_projection;
 uniform mat3 normal_matrix;
 
-// void main() {
-//     vec4 vpos = vec4(vertex_position, 1.0);
-//     float off = amp * sin(freq * vpos.z - velocity * time);
-//     vpos += vec4(normalize(vertex_normal), 1.0) * off;
-
-//     position = (model_view_matrix * vpos).xyz;
-//     normal = normalize(normal_matrix * vertex_normal);
-//     tex_coord = vertex_tex_coord;
-//     gl_Position = model_view_projection * vpos;
-// }
-
 void main() {
-    position = (model_view_matrix * vec4(vertex_position, 1.0)).xyz;
+    vec4 vpos = vec4(vertex_position, 1.0);
+    float off = material.amplitude * sin(material.frequency * vpos.z - material.velocity * time);
+    vpos += vec4(normalize(vertex_normal), 1.0) * off;
+
+    position = (model_view_matrix * vpos).xyz;
     normal = normalize(normal_matrix * vertex_normal);
     tex_coord = vertex_tex_coord;
-    gl_Position = model_view_projection * vec4(vertex_position, 1.0);
+    gl_Position = model_view_projection * vpos;
 }
